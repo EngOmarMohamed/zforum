@@ -23,19 +23,19 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $view->headTitle('ZForum')
                 ->setSeparator(' :: ');
         // Set the initial stylesheet:
-        $view->headLink()->prependStylesheet("<?= $view->baseUrl() ?>/static/css/bootstrap.min.css");
-        $view->headLink()->appendStylesheet("<?= $view->baseUrl() ?>/static/css/style.css");
-        $view->headLink()->appendStylesheet("<?= $view->baseUrl() ?>/static/css/style1.css");
-        $view->headLink()->appendStylesheet("<?= $view->baseUrl() ?>/static/font-awesome/css/font-awesome.min.css");
-        $view->headLink()->appendStylesheet("<?= $view->baseUrl() ?>/static/css/form-elements.css");
+        $view->headLink()->prependStylesheet("$view->baseUrl()/static/css/bootstrap.min.css");
+        $view->headLink()->appendStylesheet("$view->baseUrl()/static/css/style.css");
+        $view->headLink()->appendStylesheet("$view->baseUrl()/static/css/style1.css");
+        $view->headLink()->appendStylesheet("$view->baseUrl()/static/font-awesome/css/font-awesome.min.css");
+        $view->headLink()->appendStylesheet("$view->baseUrl()/static/css/form-elements.css");
         
         // Set the initial JS to load:
-        $view->headScript()->prependFile("<?= $view->baseUrl() ?>/static/js/jquery-1.11.2.js");
-        $view->headScript()->appendFile("<?= $view->baseUrl() ?>/static/js/bootstrap.min.js");
-        $view->headScript()->appendFile("<?= $view->baseUrl() ?>/static/js/jquery.backstretch.min.js");
-        $view->headScript()->appendFile("<?= $view->baseUrl() ?>/static/js/retina-1.1.0.min.js");
-        $view->headScript()->appendFile("<?= $view->baseUrl() ?>/static/js/scripts.js");
-        $view->headScript()->appendFile("<?= $view->baseUrl() ?>/static/js/index.js");
+        $view->headScript()->prependFile("$view->baseUrl()/static/js/jquery-1.11.2.js");
+        $view->headScript()->appendFile("$view->baseUrl()/static/js/bootstrap.min.js");
+        $view->headScript()->appendFile("$view->baseUrl()/static/js/jquery.backstretch.min.js");
+        $view->headScript()->appendFile("$view->baseUrl()/static/js/retina-1.1.0.min.js");
+        $view->headScript()->appendFile("$view->baseUrl()/static/js/scripts.js");
+        $view->headScript()->appendFile("$view->baseUrl()/static/js/index.js");
 
     }
 
