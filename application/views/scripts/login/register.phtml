@@ -1,0 +1,174 @@
+<div class="top-content">
+    <div class="inner-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 form-box">
+                    <div id="errorDiv" style="background-color: white;color: red; display: none;">Please, check the error fields ..!! </div>
+
+                    <form role="form" method="post" class="registration-form" id="registerForm">
+
+                        <fieldset>
+                            <div class="form-top">
+                                <div class="form-top-left">
+                                    <h3>Step 1 / 3</h3>
+                                    <p>Tell us who you are:</p>
+                                </div>
+                                <div class="form-top-right">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                            </div>
+                            <div class="form-bottom">
+                                <div class="form-group">
+                                    <label class="sr-only" for="form-first-name">Name</label>
+                                    <input type="text" name="name" placeholder="Your Name..." class="form-first-name form-control" id="form-first-name">
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr" for="image">Upload Image</label>
+                                    <span class="btn btn-default btn-file">
+                                        Browse <input type="file" id="image" class="form-control" name="image"/>
+                                    </span>
+                                    <label id="filePath"></label>
+                                    <br/><span class="errorMsg" id="imageError"></span><br/>
+                                    <img id="myImg" src="#" alt="your image"/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr">Gender</label>
+                                    <input name="gender" type="radio" value="M"/>Male
+                                    <input name="gender" type="radio" value="F"/>Female
+                                    <br/><span class="errorMsg" id="genderError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr">Choose Country</label>
+                                    <select id="e_country" name="country" required class="form-control" required>
+                                        <option value="Egypt">Egypt</option>
+                                        <option value="UK">UK</option>
+                                        <option value="USA">USA</option>
+                                    </select>
+                                    <span class="errorMsg" id="countryError"></span>
+                                </div>
+
+                                <button type="button" class="btn btn-next">Next</button>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <div class="form-top">
+                                <div class="form-top-left">
+                                    <h3>Step 2 / 3</h3>
+                                    <p>Set up your account:</p>
+                                </div>
+                                <div class="form-top-right">
+                                    <i class="fa fa-key"></i>
+                                </div>
+                            </div>
+                            <div class="form-bottom">
+                                <div class="form-group">
+                                    <label class="sr-only" for="form-username">Username</label>
+                                    <input type="text" name="username" placeholder="Username..." class="form-control" id="form-username">
+                                    <span class="errorMsg" id="usernameError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="form-email">Email</label>
+                                    <input type="text" name="email" placeholder="Email..." class="form-email form-control" id="form-email">
+                                    <span class="errorMsg" id="emailError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="password">Password</label>
+                                    <input type="password" name="password" placeholder="Password..." class="form-password form-control" id="form-password">
+                                    <span class="errorMsg" id="passwordError"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="confirm_password">Repeat password</label>
+                                    <input type="password" name="confirm_password" placeholder="Repeat password..." 
+                                           class="form-repeat-password form-control" id="form-repeat-password">
+                                </div>
+                                <button type="button" class="btn btn-previous">Previous</button>
+                                <button type="button" class="btn btn-next">Next</button>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <div class="form-top">
+                                <div class="form-top-left">
+                                    <h3>Step 3 / 3</h3>
+                                    <p>Put Your Signature:</p>
+                                </div>
+                                <div class="form-top-right">
+                                    <i class="fa fa-twitter"></i>
+                                </div>
+                            </div>
+                            <div class="form-bottom">
+                                <div class="form-group">
+                                    <label class="sr-only" for="form-about-yourself">Signature</label>
+                                    <textarea name="signature" placeholder="Signature..." 
+                                              class="form-about-yourself form-control" id="form-about-yourself"></textarea>
+                                </div>
+                                <button type="button" class="btn btn-previous">Previous</button>
+                                <button type="submit" class="btn">Sign me up!</button>
+                            </div>
+                        </fieldset>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("form#registerForm").submit(function () {
+            var formData = new FormData(this);
+            $(".errorMsg").html("");
+            if ($('#form-password').val() != $('#form-repeat-password').val()) {
+                alert("Password isn't matched");
+            } else {
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/login/register",
+                    type: 'POST',
+                    enctype: "multipart/form-data",
+                    data: formData,
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            window.location.href = "index"
+                        } else if (data.status == "failed") {
+                            for (var key in data.errorMessages) {
+                                if (!data.errorMessages.hasOwnProperty(key))
+                                    continue;
+                                var errorMsg = data.errorMessages[key];
+                                $("#" + key + "Error").html(errorMsg);
+                            }
+                            $("#errorDiv").show();
+                        } else if (data.status == "error") {
+                            alert("Error in  Add User!! .. try again");
+                        } else if (data.status == "errorRedirect") {
+                            alert("can't redirect to home");
+                        }
+                    },
+                    error: function (errorData) {
+                        console.log(errorData);
+                        alert("Error in F process");
+                    },
+                });
+            }
+            return false;
+        });
+    });
+
+    $(function () {
+        $(":file").change(function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = imageIsLoaded;
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+
+    function imageIsLoaded(e) {
+        $('#myImg').attr('src', e.target.result);
+    };
+</script>

@@ -1,0 +1,115 @@
+<div class="container">
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Forum</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if (!empty($this->posts)):
+                foreach ($this->posts as $post):
+                    ?>
+                    <tr class='info' id="<?= $post['id'] ?>">
+                        <td><strong><a href="#"  ><?= $post['title'] ?></a></strong></td>
+                        <td><?= $post['name'] ?></td>
+                        <td><button class="btn btn-info fillEditPost" data-toggle='modal' data-target='#editPostModal'><span class='glyphicon glyphicon-pencil'>Edit</span></button></td>
+                    </tr>
+                    <?php
+                endforeach;
+            endif;
+            ?>
+        </tbody>
+    </table>
+</div>
+<div class='modal fade' id='editPostModal'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-heading'>
+                <div class='modal-title'>
+                    <h2 class='bg-primary'>Edit Post</h2>
+                </div>
+            </div>
+            <div class='modal-body'>
+
+                <form role="form" id="editPostForm">
+                    <div class="form-group has-success">
+                        <label for="text">Title:  </label>
+                        <input type="text" id="e_title" name="title" class="form-control" required/>
+                        <span class="errorMsg" id="e_titleError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Content:  </label>
+                        <textarea style="height: 10em;" id="e_content" name="content" class="form-control" required></textarea>
+                        <span class="errorMsg" id="e_contentError"></span>
+                    </div>
+                    <input type="hidden" id="editID" name="editID"/>
+                    <div class='modal-footer'>
+                        <button id="editPost" type="submit" class="btn btn-info">Edit Post</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $(document).on("click", ".fillEditPost", function () {
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/post/edit",
+                method: "get",
+                dataType: "json",
+                data: {"post_id": $(this).parent().parent().attr("id")},
+                success: function (data) {
+                    if (data.status == "success") {
+                        $('#editPostModal #e_title').val(data.editRow.title);
+                        $('#editPostModal #e_content').text(data.editRow.content);
+                        $('#editPostModal #editID').val(data.editRow.id);
+                    } else {
+                        alert("Error in Edit process");
+                        $('#editPostModal').modal('hide');
+                    }
+                },
+                error: function (errorData) {
+                    alert("Error in fill process");
+                },
+            });
+        });
+        $("form#editPostForm").submit(function () {
+            var formData = new FormData(this);
+            $(".errorMsg").html("");
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/post/edit",
+                type: 'POST',
+                data: formData,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status == "success") {
+                        window.location.href = "post"
+                    } else if (data.status == "failed") {
+                        for (var key in data.errorMessages) {
+                            if (!data.errorMessages.hasOwnProperty(key))
+                                continue;
+                            var errorMsg = data.errorMessages[key];
+                            $("#e_" + key + "Error").html(errorMsg);
+                        }
+                    } else if (data.status == "error") {
+                        alert("Error in  Edit Post!! .. try again");
+                    }
+                },
+                error: function (errorData) {
+                    console.log(errorData);
+                    alert("Error in F process");
+                },
+            });
+            return false;
+        });
+    });
+
+</script>

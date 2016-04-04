@@ -1,0 +1,419 @@
+<div class="container">
+    <button class='btn btn-success' data-toggle='modal' data-target='#addUserModal'><span class="glyphicon glyphicon-plus"></span> Add User</button>
+    <table id="usersTable" style="text-align: center;">
+        <thead>
+            <tr>
+                <th style="text-align: center;"> Name </th>
+                <th style="text-align: center;"> Gender </th>
+                <th style="text-align: center;"> Image </th>
+                <th style="text-align: center;"> Country </th>
+                <th style="text-align: center;"> Action </th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if (!empty($this->users)):
+                foreach ($this->users as $user):
+                    if ($user['gender'] == 'M') {
+                        $user['gender'] = "Male";
+                    } else {
+                        $user['gender'] = "Female";
+                    }
+                    ?>
+                    <tr class='info' id="<?= $user['id'] ?>">
+                        <td class="user_name"><?= $user['name'] ?></td><td class="user_gender"><?= $user['gender'] ?></td><td class="user_photo"><img width='150px' height='100px' src="<?= $this->baseUrl() ?>/uploads/user/<?= isset($user['image']) ? $user['image'] : "pic.png" ?>"/></td><td class="user_country"><?= $user['country'] ?></td><td>
+                            <?php if ($user["type"] != "root" || $this->auth_info->type == "root") { ?>
+                                <button class="btn btn-info fillEditUser" data-toggle='modal' data-target='#editUserModal'><span class='glyphicon glyphicon-pencil'>Edit</span></button>
+                                <?php if ($user["id"] != $this->auth_info->id) { ?>
+                                    |<button class="btn btn-danger deleteUser"><span class='glyphicon glyphicon-remove'>Delete</span></button>
+
+                                    <?php if ($user['ban_flag'] == 0) { ?>
+                                        |<button class="btn btn-warning banUser"><span class='glyphicon glyphicon-ban-circle'>Ban</span></button>
+                                    <?php } else { ?>
+                                        <button class="btn btn-success banUser"><span class='glyphicon glyphicon-ok'>Unban</span></button>
+                                    <?php } ?>
+
+                                    <?php if ($user['type'] == "user") { ?>
+                                        |<button class="btn btn-default adminUser"><span class='glyphicon glyphicon-thumbs-up'>Make Admin</span></button>
+                                    <?php } else { ?>
+                                        |<button class="btn btn-default adminUser"><span class='glyphicon glyphicon-thumbs-down'>Remove as Admin</span></button>
+                                    <?php } ?>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                    <?php
+                endforeach;
+            endif;
+            ?>
+        </tbody>
+    </table>
+</div>
+<div class='modal fade' id='addUserModal'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-heading'>
+                <div class='modal-title'>
+                    <h2 class='bg-primary'>Add User</h2>
+                </div>
+            </div>
+            <div class='modal-body'>
+                <form role="form" id="addUserForm" enctype="multipart/form-data">
+                    <div class="form-group has-success">
+                        <label for="text">Name:  </label>
+                        <?= $this->addUserForm->name->renderViewHelper(); ?>
+                        <span class="errorMsg" id="nameError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Username:  </label>
+                        <?= $this->addUserForm->username->renderViewHelper(); ?>
+                        <span class="errorMsg" id="usernameError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Password:  </label>
+                        <?= $this->addUserForm->password->renderViewHelper(); ?>
+                        <span class="errorMsg" id="passwordError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Confirm Password:  </label>
+                        <?= $this->addUserForm->confirm_password->renderViewHelper(); ?>
+                        <span class="errorMsg" id="confirm_passwordError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Email:  </label>
+                        <?= $this->addUserForm->email->renderViewHelper(); ?>
+                        <span class="errorMsg" id="emailError"></span>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label for="text">Choose Country:  </label>
+                        <?= $this->addUserForm->country->renderViewHelper(); ?>
+                        <span class="errorMsg" id="countryError"></span>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label for="text">Gender:  </label><br/>
+                        <?= $this->addUserForm->gender->renderViewHelper(); ?>
+                        <span class="errorMsg" id="genderError"></span>
+                    </div>
+
+                    <div class="form-group  has-success " >
+                        <label >Upload image:</label>
+                        <span class="btn btn-default btn-file">
+                            Browse <input type="file" id="image" class="form-control" name="image"/>
+                        </span>
+                        <label id="filePath"></label><br/>
+                        <span class="errorMsg" id="imageError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Signature:  </label>
+                        <?= $this->addUserForm->signature->renderViewHelper(); ?>
+                        <span class="errorMsg" id="signatureError"></span>
+                    </div>
+                    <div class='modal-footer'>
+                        <?= $this->addUserForm->submit->renderViewHelper(); ?>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='modal fade' id='editUserModal'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-heading'>
+                <div class='modal-title'>
+                    <h2 class='bg-primary'>Edit User</h2>
+                </div>
+            </div>
+            <div class='modal-body'>
+
+                <form role="form" id="editUserForm">
+                    <div class="form-group has-success">
+                        <label for="text">Name:  </label>
+                        <input type="text" id="e_name" name="name" class="form-control" required/>
+                        <span class="errorMsg" id="e_nameError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Username:  </label>
+                        <input type="text" id="e_username" name="username" class="form-control" required/>
+                        <span class="errorMsg" id="e_usernameError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Password(change to a new password or keep the old):  </label>
+                        <input type="password" id="e_user_password" name="password" class="form-control"/>
+                        <span class="errorMsg" id="e_passwordError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Confirm password:  </label>
+                        <input type="password" id="e_user_co_password" name="confirm_password" class="form-control"/>
+                        <span class="errorMsg" id="e_confirm_passwordError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Email:  </label>
+                        <input type="email" id="e_email" name="email" class="form-control" required/>
+                        <span class="errorMsg" id="e_emailError"></span>
+                    </div>
+                    <div class="form-group  has-success " >
+                        <label >Choose Country:</label>
+                        <select id="e_country" name="country" required class="form-control">
+                            <option value="Egypt">Egypt</option>
+                            <option value="UK">UK</option>
+                            <option value="USA">USA</option>
+                        </select>
+                        <span class="errorMsg" id="e_countryError"></span>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label for="text">Gender:  </label><br/>
+                        <input name="gender" type="radio" value="M" />Male<br/>
+                        <input name="gender" type="radio" value="F"/>Female
+                        <span class="errorMsg" id="e_genderError"></span>
+                    </div>
+                    <div class="form-group  has-success " >
+                        <label >Upload image(upload new one or keep the old):</label>
+                        <span class="btn btn-default btn-file">
+                            Browse <input type="file" id="e_image" class="form-control" name="image"/>
+                        </span>
+                        <label id="filePath"></label>
+                        <span class="errorMsg" id="e_imageError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Signature:  </label>
+                        <input type="text" id="e_signature" name="signature" class="form-control"/>
+                        <span class="errorMsg" id="e_signatureError"></span>
+                    </div>
+                    <input type="hidden" id="editID" name="editID">
+                    <div class='modal-footer'>
+                        <button id="editUser" type="submit" class="btn btn-info">Edit User</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(document).on("click", ".adminUser", function () {
+            var btn = $(this);
+            if ($(this).text() == "Make Admin") {
+                var type = 1;
+            } else if ($(this).text() == "Remove as Admin") {
+                var type = 0;
+            } else {
+                alert("Error in value, Try again");
+            }
+            if (typeof type !== 'undefined') {
+                var obj = {
+                    user_id: $(this).parent().parent().attr("id"),
+                    type: type
+                }
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/user/change-type",
+                    method: "post",
+                    dataType: "json",
+                    data: obj,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            if (data.type == "admin") {
+                                $(btn).html("<span class='glyphicon glyphicon-thumbs-down'>Remove as Admin</span>");
+                            } else {
+                                $(btn).html("<span class='glyphicon glyphicon-thumbs-up'>Make Admin</span>");
+                            }
+                        } else {
+                            alert("Error in Change Supervision");
+                        }
+                    },
+                    error: function (errorData) {
+                        alert("Error in change supervision process");
+                    },
+                });
+            }
+        });
+
+        $(document).on("click", ".banUser", function () {
+            var btn = $(this);
+            if ($(this).text() == "Ban") {
+                var ban = 1;
+            } else if ($(this).text() == "Unban") {
+                var ban = 0;
+            } else {
+                alert("Error in value, Try again");
+            }
+            if (typeof ban !== 'undefined') {
+                var obj = {
+                    user_id: $(this).parent().parent().attr("id"),
+                    ban: ban
+                }
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/user/change-ban",
+                    method: "post",
+                    dataType: "json",
+                    data: obj,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            if (data.ban == "1") {
+                                $(btn).removeClass("btn-warning");
+                                $(btn).addClass("btn-success");
+                                $(btn).html("<span class='glyphicon glyphicon-ok'>Unban</span>");
+                            } else {
+                                $(btn).removeClass("btn-success");
+                                $(btn).addClass("btn-warning");
+                                $(btn).html("<span class='glyphicon glyphicon-ban-circle'>Ban</span>");
+                            }
+                        } else {
+                            alert("Error in Change Blocking");
+                        }
+                    },
+                    error: function (errorData) {
+                        alert("Error in change blocking process");
+                    },
+                });
+            }
+        });
+
+
+        $('.btn-file #image').change(function () {
+            $(".btn-file ~ #filePath").text("");
+            $(".btn-file ~ #filePath").text($(this).val());
+        });
+        $('.btn-file #e_image').change(function () {
+            $(".btn-file ~ #filePath").text("");
+            $(".btn-file ~ #filePath").text($(this).val());
+        });
+        //////////////Delete User//////////////////        
+        $(document).on("click", ".deleteUser", function () {
+            var userRow = $(this);
+            var obj = {
+                user_id: $(this).parent().parent().attr("id"),
+            }
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/user/delete",
+                method: "post",
+                dataType: "json",
+                data: obj,
+                success: function (data) {
+                    console.log(data);
+                    if (data.status == "success") {
+                        $(userRow).parent().parent().remove();
+                    } else {
+                        alert("Error in delete process");
+                    }
+                },
+                error: function (errorData) {
+                    console.log(errorData);
+                    alert("Error in F process");
+                },
+            });
+        });
+
+        $(document).on("click", ".fillEditUser", function () {
+        $(".errorMsg").html("");
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/user/edit",
+                method: "get",
+                dataType: "json",
+                data: {"user_id": $(this).parent().parent().attr("id")},
+                success: function (data) {
+                    if (data.status == "success") {
+                        $('#editUserModal #e_name').val(data.editRow.name);
+                        $('#editUserModal #e_username').val(data.editRow.username);
+                        $('#editUserModal #e_country option[value="' + data.editRow.country + '"]').prop('selected', true)
+                        $('input[name=gender][value="' + data.editRow.gender + '"]').prop('checked', true);
+                        $('#editUserModal #e_signature').val(data.editRow.signature);
+                        $('#editUserModal #e_email').val(data.editRow.email);
+                        $('#editUserModal #editID').val(data.editRow.id);
+                    } else {
+                        alert("Error in Edit process");
+                    }
+                },
+                error: function (errorData) {
+                    alert("Error in fill process");
+                },
+            });
+        });
+
+
+        $("form#addUserForm").submit(function () {
+            var formData = new FormData(this);
+            $(".errorMsg").html("");
+            if ($('#user_co_password').val() != $('#user_password').val()) {
+                alert("Password isn't matched");
+            } else {
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/user/add",
+                    type: 'POST',
+                    enctype: "multipart/form-data",
+                    data: formData,
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            window.location.href = "user"
+                        } else if (data.status == "failed") {
+                            for (var key in data.errorMessages) {
+                                if (!data.errorMessages.hasOwnProperty(key))
+                                    continue;
+                                var errorMsg = data.errorMessages[key];
+                                $("#" + key + "Error").html(errorMsg);
+                            }
+                        } else if (data.status == "error") {
+                            alert("Error in  Add User!! .. try again");
+                        }
+                    },
+                    error: function (errorData) {
+                        console.log(errorData);
+                        alert("Error in F process");
+                    },
+                });
+            }
+            return false;
+        });
+
+        $("form#editUserForm").submit(function () {
+            var formData = new FormData(this);
+            $(".errorMsg").html("");
+            if ($('#e_user_co_password').val() != $('#e_user_password').val()) {
+                alert("Password isn't matched");
+            } else {
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/user/edit",
+                    type: 'POST',
+                    enctype: "multipart/form-data",
+                    data: formData,
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            window.location.href = "user"
+                        } else if (data.status == "failed") {
+                            for (var key in data.errorMessages) {
+                                if (!data.errorMessages.hasOwnProperty(key))
+                                    continue;
+                                var errorMsg = data.errorMessages[key];
+                                $("#e_" + key + "Error").html(errorMsg);
+                            }
+                        } else if (data.status == "error") {
+                            alert("Error in  Add User!! .. try again");
+                        }
+                    },
+                    error: function (errorData) {
+                        console.log(errorData);
+                        alert("Error in F process");
+                    },
+                });
+            }
+            return false;
+        });
+
+    });
+
+</script>

@@ -1,0 +1,14 @@
+
+<div class="login" align="center">
+    <?= isset($this->loginError) ? "<span class='errorMsg'>" . $this->loginError . "</span>" : ""; ?>
+    <header class="header">
+        <span class="text">LOGIN</span>
+        <span class="loader"></span>
+    </header>
+    <!--    <form class="form">  
+            <input class="input" type="text", placeholder="Username" name="username">
+            <input class="input" type="password" placeholder="Password" name="password">
+            <button class="login-button" type="submit"></button>
+        </form>-->
+    <?php echo $this->loginForm ?>
+</div>
