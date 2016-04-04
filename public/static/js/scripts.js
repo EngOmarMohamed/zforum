@@ -4,7 +4,7 @@ jQuery(document).ready(function () {
     /*
      Fullscreen background
      */
-    $.backstretch("static/img/backgrounds/1.jpg");
+    $.backstretch("../../static/img/backgrounds/1.jpg");
 
     $('#top-navbar-1').on('shown.bs.collapse', function () {
         $.backstretch("resize");
