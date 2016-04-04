@@ -23,7 +23,7 @@ $application = new Zend_Application(
 $config = new Zend_Config_Ini(
         APPLICATION_PATH . '/configs/application.ini', APPLICATION_ENV);
 $baseUrl = $config->baseHttp;
-define('BASE_URL', realpath(dirname(__FILE__));
+define('BASE_URL', realpath(dirname(__FILE__)));
 
 defined('PUBLIC_PATH')
 || define('PUBLIC_PATH', realpath(dirname(__FILE__)));
