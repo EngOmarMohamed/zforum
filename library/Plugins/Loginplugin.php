@@ -52,13 +52,13 @@ class Plugins_Loginplugin extends Zend_Controller_Plugin_Abstract {
                             $request->setControllerName('index');
                             $request->setActionName('index');
                         } else {
-                            die("ffff===");
+
                             $request->setControllerName('error');
                             $request->setActionName('error');
                         }
                     }
                 } else if (!empty($view->auth_info) && $view->auth_info->type != "user") {
-                    die("==xxxx");
+
                     $controllers_admin = array(
                         "login" => array("index", "register"),
                     );
