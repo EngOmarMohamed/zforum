@@ -3,6 +3,7 @@
 class Plugins_Loginplugin extends Zend_Controller_Plugin_Abstract {
 
     public function preDispatch(Zend_Controller_Request_Abstract $request) {
+//        die("===dddd");
         $authorization = Zend_Auth::getInstance();
         $controllers = array(
             "index" => array("change-availability"),
@@ -23,14 +24,10 @@ class Plugins_Loginplugin extends Zend_Controller_Plugin_Abstract {
             if (!empty($view->auth_info)) {
                 $sysModel = new Application_Model_DbTable_CloseSystem();
                 $userModel = new Application_Model_DbTable_User();
-//                $authorization = Zend_Auth::getInstance();
                 $info = $authorization->getIdentity();
-//                print_r($info);die("---");
                 $id = $info->id;
-//                print_r($sysModel->checkAvailability());
-//                echo '---';
-//                var_dump($userModel->checkBlockingById($id));
-//                die("==");
+
+//                    die($view->auth_info->type);
                 if ($userModel->checkBlockingById($id) || ($info->type == "user" && !$sysModel->checkAvailability())) {
 //                    $this->redirect("login/logout");
 //                    var_dump($request->isGet());
@@ -45,31 +42,34 @@ class Plugins_Loginplugin extends Zend_Controller_Plugin_Abstract {
                         echo json_encode(array("status" => "system"));
                         exit;
                     }
-                }
-            } else if (!empty($view->auth_info) && $view->auth_info->type == "user") {
-                $controllers['login'] = array("index", "register");
-                $controllers['post'] = array("change-permit", "delete");
-                $controllers['comment'] = array("index");
+                } else if (!empty($view->auth_info) && $view->auth_info->type == "user") {
+                    $controllers['login'] = array("index", "register");
+                    $controllers['post'] = array("change-permit", "delete");
+                    $controllers['comment'] = array("index");
 
-                if (in_array($request->getControllerName(), array_keys($controllers)) && in_array($request->getActionName(), $controllers[$request->getControllerName()])) {
-                    if ($request->getControllerName() == "login") {
+                    if (in_array($request->getControllerName(), array_keys($controllers)) && in_array($request->getActionName(), $controllers[$request->getControllerName()])) {
+                        if ($request->getControllerName() == "login") {
+                            $request->setControllerName('index');
+                            $request->setActionName('index');
+                        } else {
+                            die("ffff===");
+                            $request->setControllerName('error');
+                            $request->setActionName('error');
+                        }
+                    }
+                } else if (!empty($view->auth_info) && $view->auth_info->type != "user") {
+                    die("==xxxx");
+                    $controllers_admin = array(
+                        "login" => array("index", "register"),
+                    );
+                    if (in_array($request->getControllerName(), array_keys($controllers_admin)) && in_array($request->getActionName(), $controllers_admin[$request->getControllerName()])) {
                         $request->setControllerName('index');
                         $request->setActionName('index');
-                    } else {
-                        $request->setControllerName('error');
-                        $request->setActionName('error');
                     }
-                }
-            } else if (!empty($view->auth_info) && $view->auth_info->type != "user") {
-                $controllers_admin = array(
-                    "login" => array("index", "register"),
-                );
-                if (in_array($request->getControllerName(), array_keys($controllers_admin)) && in_array($request->getActionName(), $controllers_admin[$request->getControllerName()])) {
-                    $request->setControllerName('index');
-                    $request->setActionName('index');
                 }
             }
         }
     }
 
 }
+
