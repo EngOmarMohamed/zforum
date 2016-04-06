@@ -14,7 +14,7 @@
                 foreach ($this->posts as $post):
                     ?>
                     <tr class='info' id="<?= $post['id'] ?>">
-                        <td><strong><a href="#"  ><?= $post['title'] ?></a></strong></td>
+                        <td><strong><a href="<?= $this->baseUrl() ?>/post/show-single/id/<?= $post['id'] ?>"  ><?= $post['title'] ?></a></strong></td>
                         <td><?= $post['name'] ?></td>
                         <td><button class="btn btn-info fillEditPost" data-toggle='modal' data-target='#editPostModal'><span class='glyphicon glyphicon-pencil'>Edit</span></button></td>
                     </tr>
@@ -69,6 +69,10 @@
                         $('#editPostModal #e_title').val(data.editRow.title);
                         $('#editPostModal #e_content').text(data.editRow.content);
                         $('#editPostModal #editID').val(data.editRow.id);
+                    } else if (data.status == "system") {
+                        $('#editPostModal').modal('hide');
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     } else {
                         alert("Error in Edit process");
                         $('#editPostModal').modal('hide');
@@ -91,7 +95,7 @@
                 contentType: false,
                 success: function (data) {
                     if (data.status == "success") {
-                        window.location.href = "post"
+                        location.reload();
                     } else if (data.status == "failed") {
                         for (var key in data.errorMessages) {
                             if (!data.errorMessages.hasOwnProperty(key))
@@ -101,6 +105,9 @@
                         }
                     } else if (data.status == "error") {
                         alert("Error in  Edit Post!! .. try again");
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     }
                 },
                 error: function (errorData) {

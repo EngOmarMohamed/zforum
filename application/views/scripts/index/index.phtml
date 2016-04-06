@@ -168,6 +168,7 @@
             $forum_name = $this->index[$i]['name'];
             $cat_id = $this->index[$i]['id'];
             $forum_id = $this->index[$i]['forum_id'];
+            $allow_post = $this->index[$i]['allow_post'];
             ?>              
             <div class='panel-group' id="<?= $cat_id ?>">
                 <div class='panel panel-default panel-info'>
@@ -188,35 +189,48 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>name</th>
-                                    <th>Action</th>
+                                    <th>Forum</th>
+                                    <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                        <th>Action</th>
+                                    <?php } ?>
                                 </tr>
                             </thead>
                             <?php if (isset($forum_name)) { ?>
                                 <tbody>
                                     <tr id="<?= $forum_id ?>">
-                                        <td><strong><a href='#'  ><?= $forum_name ?></a></strong></td>
-                                        <td>
-                                            <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                        <td><strong><a href="<?= $this->baseUrl() ?>/forum/index/id/<?= $forum_id ?>"  ><?= $forum_name ?></a></strong></td>
+                                        <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                            <td>
+                                                <?php if ($allow_post == 0) { ?>
+                                                    <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-success allowPost"><span class='glyphicon glyphicon-ok'>Allow Post</span></button>
+                                                <?php } else { ?>
+                                                    <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-warning allowPost"><span class='glyphicon glyphicon-ban-circle'>Disallow Post</span></button>
+                                                <?php } ?>
                                                 <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-danger deleteForum'><span class="glyphicon glyphicon-remove-circle"></span>Delete</button>
                                                 <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-info fillEditForum' data-toggle='modal' data-target='#editForumModal'><span class="glyphicon glyphicon-pencil"></span>Edit</button>
-                                            <?php } ?>    
-                                        </td>
+                                            </td>
+                                        <?php } ?>    
                                     </tr>
                                     <?php
                                     for ($v = $i + 1; $v < count($this->index); $v++) {
                                         if ($this->index[$v]['id'] == $cat_id) {
                                             $forum_name = $this->index[$v]['name'];
                                             $forum_id = $this->index[$v]['forum_id'];
+                                            $allow_post = $this->index[$v]['allow_post'];
                                             ?>    
                                             <tr id="<?= $forum_id ?>">
-                                                <td><strong><a href='#'  ><?= $forum_name ?></a></strong></td>
-                                                <td>
-                                                    <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                                <td><strong><a href='<?= $this->baseUrl() ?>/forum/index/id/<?= $forum_id ?>'  ><?= $forum_name ?></a></strong></td>
+                                                <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                                    <td>
+                                                        <?php if ($allow_post == 0) { ?>
+                                                            <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-success allowPost"><span class='glyphicon glyphicon-ok'>Allow Post</span></button>
+                                                        <?php } else { ?>
+                                                            <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-warning allowPost"><span class='glyphicon glyphicon-ban-circle'>Disallow Post</span></button>
+                                                        <?php } ?>
                                                         <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-danger deleteForum'><span class="glyphicon glyphicon-remove-circle"></span>Delete</button>
                                                         <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-info fillEditForum' data-toggle='modal' data-target='#editForumModal'><span class="glyphicon glyphicon-pencil"></span>Edit</button>
-                                                    <?php } ?>
-                                                </td>
+                                                    </td>
+                                                <?php } ?>
                                             </tr>
 
                                             <?php
@@ -270,6 +284,9 @@
                                 $(btn).addClass("btn-success");
                                 $(btn).html("<span class='glyphicon glyphicon-ok'>Open The System</span>");
                             }
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
                         } else {
                             alert("Error in Change Close");
                         }
@@ -280,6 +297,7 @@
                 });
             }
         });
+
         ///////////////////////Category Section////////////////////////
         $("form#addCatForm").submit(function () {
             var formData = new FormData(this);
@@ -304,6 +322,9 @@
                         }
                     } else if (data.status == "error") {
                         alert("Error in  Add Category!! .. try again");
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     }
                 },
                 error: function (errorData) {
@@ -325,6 +346,9 @@
                     if (data.status == "success") {
                         $('#editCatModal #e_category').val(data.editRow.category);
                         $('#editCatModal #editID').val(data.editRow.id);
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     } else {
                         alert("Error in Edit process");
                         $('#editCatModal').modal('hide');
@@ -358,6 +382,9 @@
                         }
                     } else if (data.status == "error") {
                         alert("Error in  Edit Category!! .. try again");
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     }
                 },
                 error: function (errorData) {
@@ -381,6 +408,9 @@
                 success: function (data) {
                     if (data.status == "success") {
                         $(catRow).parent().parent().parent().remove();
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     } else {
                         alert("Error in delete process");
                     }
@@ -423,6 +453,9 @@
                         }
                     } else if (data.status == "error") {
                         alert("Error in  Add Forum!! .. try again");
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     }
                 },
                 error: function (errorData) {
@@ -445,6 +478,9 @@
                         $('#editForumModal #e_name').val(data.editRow.name);
                         $('#editForumModal #e_catId').val(data.editRow.category_id);
                         $('#editForumModal #f_editID').val(data.editRow.id);
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     } else {
                         alert("Error in Edit process");
                         $('#editCatModal').modal('hide');
@@ -478,6 +514,9 @@
                         }
                     } else if (data.status == "error") {
                         alert("Error in  Edit Category!! .. try again");
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     }
                 },
                 error: function (errorData) {
@@ -487,9 +526,9 @@
             });
             return false;
         });
-        
+
         $(document).on("click", ".deleteForum", function () {
-        alert($(this).parent().parent().attr("id"));
+//            alert($(this).parent().parent().attr("id"));
             var forumRow = $(this);
             var obj = {
                 forum_id: $(this).parent().parent().attr("id"),
@@ -502,6 +541,9 @@
                 success: function (data) {
                     if (data.status == "success") {
                         $(forumRow).parent().parent().remove();
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     } else {
                         alert("Error in delete process");
                     }
@@ -511,6 +553,50 @@
                     alert("Error in F process");
                 },
             });
+        });
+
+        $(document).on("click", ".allowPost", function () {
+            var btn = $(this);
+            if ($(this).text() == "Allow Post") {
+                var allow = 1;
+            } else if ($(this).text() == "Disallow Post") {
+                var allow = 0;
+            } else {
+                alert("Error in value, Try again");
+            }
+            if (typeof allow !== 'undefined') {
+                var obj = {
+                    forum_id: $(this).parent().parent().attr("id"),
+                    allow: allow
+                }
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/forum/change-permit",
+                    method: "post",
+                    dataType: "json",
+                    data: obj,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            if (data.allow == "1") {
+                                $(btn).removeClass("btn-success");
+                                $(btn).addClass("btn-warning");
+                                $(btn).html("<span class='glyphicon glyphicon-ban-circle'>Disallow Post</span>");
+                            } else {
+                                $(btn).removeClass("btn-warning");
+                                $(btn).addClass("btn-success");
+                                $(btn).html("<span class='glyphicon glyphicon-ok'>Allow Post</span>");
+                            }
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
+                        } else {
+                            alert("Error in Change Permit");
+                        }
+                    },
+                    error: function (errorData) {
+                        alert("Error in Permit process");
+                    },
+                });
+            }
         });
     });
 </script>

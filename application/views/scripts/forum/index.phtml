@@ -1,4 +1,363 @@
-<br /><br />
-<div id="view-content">
-	<p>View script for controller <b>Forum</b> and script/action name <b>index</b></p>
+<div class="container">
+    <?php
+    if ($this->index) {
+        for ($i = 0; $i < count($this->index); $i++) {
+            $post_id = $this->index[$i]['id'];
+            $allow_replies = $this->index[$i]['allow_replies'];
+            $allow_post = $this->index[$i]['allow_post'];
+            $title = $this->index[$i]['title'];
+            $username = $this->index[$i]['username'];
+            $user_id = $this->index[$i]['user_id'];
+            $forum_name = $this->index[$i]['forum_name'];
+            $forum_id = $this->index[$i]['forum_id'];
+
+            if (!empty($this->auth_info) && $allow_post == 1) {
+                ?>
+                <button class='btn btn-success addPostBtn' data-toggle='modal' data-target='#addPostModal'><span class="glyphicon glyphicon-plus"></span> Add Post</button>
+            <?php } else if (empty($this->auth_info)) { ?>
+                <a class="btn btn-success" href="<?= $this->baseUrl() ?>/login"><span class="glyphicon glyphicon-plus"></span>Add Post</a>
+            <?php } else { ?>
+                <div style="background-color: #bce8f1">Adding Posts are disabled for this Forum .. try again later</div>
+            <?php } ?>
+            <div class='panel-group' id="<?= $forum_id ?>">
+                <div class='panel panel-default panel-info'>
+                    <div class='panel-heading'>
+                        <a style='float: left;' data-toggle='collapse' class='btn  btn-type btn-sm btn-default collapsed' href='#collapse<?= $i ?>'></a>
+                        <div style='text-align: center;' class='panel-title'>
+                            <a href='' class='text-center '><?= $forum_name ?></a>
+                        </div>
+                    </div>
+                    <div  id='collapse<?= $i ?>' class='panel-collapse collapse'>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                        <th>Action</th>
+                                    <?php } ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="<?= $post_id ?>">
+                                    <td><strong><a href='<?= $this->baseUrl() ?>/post/show-single/id/<?= $post_id ?>'  ><?= $title ?></a></strong></td>
+                                    <td><?= $username ?></td>
+                                    <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                        <td>
+                                            <?php if ($allow_replies == 0) { ?>
+                                                <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-success allowReply"><span class='glyphicon glyphicon-ok'>Allow Replies</span></button>
+                                            <?php } else { ?>
+                                                <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-warning allowReply"><span class='glyphicon glyphicon-ban-circle'>Disallow Replies</span></button>
+                                            <?php } ?>
+                                            <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-danger deletePost'><span class="glyphicon glyphicon-remove-circle"></span>Delete</button>
+                                            <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-info fillEditPost' data-toggle='modal' data-target='#editPostModal'><span class="glyphicon glyphicon-pencil"></span>Edit</button>
+                                        </td>
+                                    <?php } ?>
+                                </tr>
+                                <?php
+                                for ($v = $i + 1; $v < count($this->index); $v++) {
+                                    if ($this->index[$v]['forum_id'] == $forum_id) {
+
+                                        $post_id = $this->index[$v]['id'];
+                                        $allow_replies = $this->index[$v]['allow_replies'];
+                                        $title = $this->index[$v]['title'];
+                                        $username = $this->index[$v]['username'];
+                                        $user_id = $this->index[$v]['user_id'];
+                                        $forum_name = $this->index[$v]['forum_name'];
+                                        $forum_id = $this->index[$v]['forum_id'];
+                                        ?>    
+                                        <tr id="<?= $post_id ?>">
+                                            <td><strong><a href='<?= $this->baseUrl() ?>/post/show-single/id/<?= $post_id ?>' ><?= $title ?></a></strong></td>
+                                            <td><?= $username ?></td>
+                                            <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
+                                                <td>
+                                                    <?php if ($allow_replies == 0) { ?>
+                                                        <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-success allowReply"><span class='glyphicon glyphicon-ok'>Allow Replies</span></button>
+                                                    <?php } else { ?>
+                                                        <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class="btn btn-warning allowReply"><span class='glyphicon glyphicon-ban-circle'>Disallow Replies</span></button>
+                                                    <?php } ?>
+                                                    <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-danger deletePost'><span class="glyphicon glyphicon-remove-circle"></span>Delete</button>
+                                                    <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-info fillEditPost' data-toggle='modal' data-target='#editPostModal'><span class="glyphicon glyphicon-pencil"></span>Edit</button>
+                                                </td>
+                                            <?php } ?>
+                                        </tr> 
+                                        <?php
+                                        $i++;
+
+                                        continue;
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                ?>                   
+                            </tbody>
+                        </table>
+                    </div>
+                </div> 
+            </div><?php
+        }
+    } else {
+
+        if (!empty($this->auth_info) && $this->allow_post == 1) {
+            ?>
+            <button class='btn btn-success addPostBtn' data-toggle='modal' data-target='#addPostModal'><span class="glyphicon glyphicon-plus"></span> Add Post</button>
+        <?php } else if (empty($this->auth_info)) { ?>
+            <a class="btn btn-success" href="<?= $this->baseUrl() ?>/login"><span class="glyphicon glyphicon-plus"></span>Add Post</a>
+        <?php } else { ?>
+            <div style="background-color: #bce8f1">Adding Posts are disabled for this Forum .. try again later</div>
+        <?php } ?>
+
+        <div style="background-color: #bce8f1"><h2>There is no Posts in this Forum .. <br/>be the first one to add a posts</h2></div>
+        <?php
+    }
+    ?>
 </div>
+
+
+
+<div class='modal fade' id='editPostModal'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-heading'>
+                <div class='modal-title'>
+                    <h2 class='bg-primary'>Edit Post</h2>
+                </div>
+            </div>
+            <div class='modal-body'>
+
+                <form role="form" id="editPostForm">
+                    <div class="form-group has-success">
+                        <label for="text">Title:  </label>
+                        <input type="text" id="e_title" name="title" class="form-control" required/>
+                        <span class="errorMsg" id="e_titleError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Content:  </label>
+                        <textarea style="height: 10em;" id="e_content" name="content" class="form-control" required></textarea>
+                        <span class="errorMsg" id="e_contentError"></span>
+                    </div>
+                    <input type="hidden" id="editID" name="editID"/>
+                    <div class='modal-footer'>
+                        <button id="editPost" type="submit" class="btn btn-info">Edit Post</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='modal fade' id='addPostModal'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-heading'>
+                <div class='modal-title'>
+                    <h2 class='bg-primary'>Add Post</h2>
+                </div>
+            </div>
+            <div class='modal-body'>
+
+                <form role="form" id="addPostForm">
+                    <div class="form-group has-success">
+                        <label for="text">Title:  </label>
+                        <input type="text" id="title" name="title" class="form-control" required/>
+                        <span class="errorMsg" id="titleError"></span>
+                    </div>
+                    <div class="form-group has-success">
+                        <label for="text">Content:  </label>
+                        <textarea style="height: 10em;" id="content" name="content" class="form-control" required></textarea>
+                        <span class="errorMsg" id="contentError"></span>
+                    </div>
+                    <input type="hidden" id="forumId" name="forum_id"/>
+                    <div class='modal-footer'>
+                        <button id="addPost" type="submit" class="btn btn-info">Add Post</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(document).on("click", ".allowReply", function () {
+            var btn = $(this);
+            if ($(this).text() == "Allow Replies") {
+                var allow = 1;
+            } else if ($(this).text() == "Disallow Replies") {
+                var allow = 0;
+            } else {
+                alert("Error in value, Try again");
+            }
+            if (typeof allow !== 'undefined') {
+                var obj = {
+                    post_id: $(this).parent().parent().attr("id"),
+                    allow: allow
+                }
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/post/change-permit",
+                    method: "post",
+                    dataType: "json",
+                    data: obj,
+                    success: function (data) {
+                        if (data.status == "success") {
+                            if (data.allow == "1") {
+                                $(btn).removeClass("btn-success");
+                                $(btn).addClass("btn-warning");
+                                $(btn).html("<span class='glyphicon glyphicon-ban-circle'>Disallow Replies</span>");
+                            } else {
+                                $(btn).removeClass("btn-warning");
+                                $(btn).addClass("btn-success");
+                                $(btn).html("<span class='glyphicon glyphicon-ok'>Allow Replies</span>");
+                            }
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
+                        } else {
+                            alert("Error in Change Permit");
+                        }
+                    },
+                    error: function (errorData) {
+                        alert("Error in Permit process");
+                    },
+                });
+            }
+        });
+
+        $(document).on("click", ".fillEditPost", function () {
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/post/edit",
+                method: "get",
+                dataType: "json",
+                data: {
+                    "post_id": $(this).parent().parent().attr("id"),
+                },
+                success: function (data) {
+                    if (data.status == "success") {
+                        $('#editPostModal #e_title').val(data.editRow.title);
+                        $('#editPostModal #e_content').text(data.editRow.content);
+                        $('#editPostModal #editID').val(data.editRow.id);
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
+                    } else {
+                        alert("Error in Edit process");
+                        $('#editPostModal').modal('hide');
+                    }
+                },
+                error: function (errorData) {
+                    alert("Error in fill process");
+                },
+            });
+        });
+
+        $("form#editPostForm").submit(function () {
+            var formData = new FormData(this);
+            $(".errorMsg").html("");
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/post/edit",
+                type: 'POST',
+                data: formData,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status == "success") {
+                        location.reload();
+                    } else if (data.status == "failed") {
+                        for (var key in data.errorMessages) {
+                            if (!data.errorMessages.hasOwnProperty(key))
+                                continue;
+                            var errorMsg = data.errorMessages[key];
+                            $("#e_" + key + "Error").html(errorMsg);
+                        }
+                    } else if (data.status == "error") {
+                        alert("Error in  Edit Post!! .. try again");
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
+                    }
+                },
+                error: function (errorData) {
+                    console.log(errorData);
+                    alert("Error in F process");
+                },
+            });
+            return false;
+        });
+
+        $(document).on("click", ".deletePost", function () {
+            var postRow = $(this);
+            var obj = {
+                post_id: $(this).parent().parent().attr("id"),
+            }
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/post/delete",
+                method: "post",
+                dataType: "json",
+                data: obj,
+                success: function (data) {
+                    if (data.status == "success") {
+                        $(postRow).parent().parent().remove();
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
+                    } else {
+                        alert("Error in delete process");
+                    }
+                },
+                error: function (errorData) {
+                    console.log(errorData);
+                    alert("Error in F process");
+                },
+            });
+        });
+        $(document).on("click", ".addPostBtn", function () {
+            var forum_id = <?= $this->post_forum_id ?>;
+            $("#addPostForm #forumId").val(forum_id);
+            $(".errorMsg").html("");
+        });
+
+        $("form#addPostForm").submit(function () {
+            var formData = new FormData(this);
+
+            $(".errorMsg").html("");
+
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/post/add",
+                type: 'POST',
+                data: formData,
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.status == "success") {
+                        location.reload();
+                    } else if (data.status == "failed") {
+                        for (var key in data.errorMessages) {
+                            if (!data.errorMessages.hasOwnProperty(key))
+                                continue;
+                            var errorMsg = data.errorMessages[key];
+                            $("#" + key + "Error").html(errorMsg);
+                        }
+                    } else if (data.status == "error") {
+                        alert("Error in  Add Post!! .. try again");
+                    } else if (data.status == "disallow") {
+                        alert("The Admin disallow the posts right now for this forum");
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
+                    }
+                },
+                error: function (errorData) {
+                    console.log(errorData);
+                    alert("Error in F process");
+                },
+            });
+            return false;
+        });
+
+    });
+</script>

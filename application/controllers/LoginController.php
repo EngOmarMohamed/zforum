@@ -15,10 +15,10 @@ class LoginController extends Zend_Controller_Action {
     }
 
     public function indexAction() {
-        $authorization = Zend_Auth::getInstance();
-        if ($authorization->hasIdentity()) {
-            $this->redirect('index');
-        }
+//        $authorization = Zend_Auth::getInstance();
+//        if ($authorization->hasIdentity()) {
+//            $this->redirect('index');
+//        }
 
         $username = $this->_request->getParam('username');
         $password = $this->_request->getParam('password');
@@ -72,7 +72,7 @@ class LoginController extends Zend_Controller_Action {
 
                             $auth = Zend_Auth::getInstance();
                             $storage = $auth->getStorage();
-                            $storage->write($authAdapter->getResultRowObject(array('type', 'id', 'name', "image")));
+                            $storage->write($authAdapter->getResultRowObject(array('type', 'id', 'name', "image", "username")));
 
                             $this->redirect('index');
                         } else {
@@ -91,17 +91,17 @@ class LoginController extends Zend_Controller_Action {
 
     public function logoutAction() {
         $authorization = Zend_Auth::getInstance();
-        if ($authorization->hasIdentity()) {
-            $authorization->clearIdentity();
-            $this->redirect('index');
-        }
+//        if ($authorization->hasIdentity()) {
+        $authorization->clearIdentity();
+        $this->redirect('index');
+//        }
     }
 
     public function registerAction() {
-        $authorization = Zend_Auth::getInstance();
-        if ($authorization->hasIdentity()) {
-            $this->redirect('index');
-        }
+//        $authorization = Zend_Auth::getInstance();
+//        if ($authorization->hasIdentity()) {
+//            $this->redirect('index');
+//        }
 
         if ($this->getRequest()->isPost()) {
             $request = $this->getRequest();
@@ -120,12 +120,24 @@ class LoginController extends Zend_Controller_Action {
 
                 $user = LoginController::$userModel->addUser($data);
                 if ($user) {
+                    include PUBLIC_PATH . '/../library/sendgrid-php/sendgrid-php.php';
+                    $sendgrid = new SendGrid("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");
+                    $email = new SendGrid\Email();
+                    $email
+                            ->addTo($data["email"])
+                            ->setFrom('admin@zforum.com')
+                            ->setSubject('Welcome to Zforum')
+                            ->setText('Your Registeration Info')
+                            ->setHtml("Dear Mr." . $data['name'] . "<br/>&nbsp;&nbsp;&nbsp;Thanks for registeration.<br/>your username: " . $data['username'] . "<br/>your password: " . $data['password'] . "<br/>your password: " . $data['country']);
+
                     // get the default db adapter
                     $db = Zend_Db_Table::getDefaultAdapter();
 
                     $authAdapter = new Zend_Auth_Adapter_DbTable($db, 'users', 'username', 'password');
-//set the email and password
+                    //set the email and password
                     try {
+                        $sendgrid->send($email);
+
                         $authAdapter->setIdentity($data['username']);
                         $authAdapter->setCredential(md5($data['password']));
                         //authenticate
@@ -134,7 +146,7 @@ class LoginController extends Zend_Controller_Action {
 
                             $auth = Zend_Auth::getInstance();
                             $storage = $auth->getStorage();
-                            $storage->write($authAdapter->getResultRowObject(array('type', 'id', 'name', "image")));
+                            $storage->write($authAdapter->getResultRowObject(array('type', 'id', 'name', "image", "username")));
 
                             echo json_encode(array("status" => "success"));
                             exit;
@@ -164,18 +176,18 @@ class LoginController extends Zend_Controller_Action {
 
     public function profileAction() {
         $authorization = Zend_Auth::getInstance();
-        if (!$authorization->hasIdentity()) {
-            $this->redirect('index');
-        }
+//        if (!$authorization->hasIdentity()) {
+//            $this->redirect('index');
+//        }
         if ($this->getRequest()->isGet()) {
             $auth_info = $authorization->getIdentity();
-            
+
             $editUser = LoginController::$userModel->getSingleUser($auth_info->id);
-            
+
             unset($editUser["password"]);
             unset($editUser["ban_flag"]);
             unset($editUser["type"]);
-            
+
             $this->view->editUser = $editUser;
         } else if ($this->getRequest()->isPost()) {
             $request = $this->getRequest();

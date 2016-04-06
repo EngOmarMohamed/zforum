@@ -8,7 +8,7 @@ class Application_Model_DbTable_Category extends Zend_Db_Table_Abstract {
         $sql = $this->select()
                 ->setIntegrityCheck(false)
                 ->from(array('g' => 'category'), array('id', 'category'))
-                ->joinLeft(array('f' => 'forum'), 'f.category_id = g.id', array('name', "id as forum_id"))
+                ->joinLeft(array('f' => 'forum'), 'f.category_id = g.id', array('name', "id as forum_id", "allow_post"))
 //                ->where('g.id = f.category_id')
         ;
         $resultSet = $this->fetchAll($sql)->toArray();

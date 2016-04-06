@@ -1,0 +1,186 @@
+<div class="container">
+    <?php
+    if ($this->index) {
+        for ($i = 0; $i < count($this->index); $i++) {
+
+            $title = $this->index[$i]['title'];
+            $username = $this->index[$i]['username'];
+            $name = $this->index[$i]['name'];
+            $comment = $this->index[$i]['comment'];
+            $content = $this->index[$i]['content'];
+            $image = $this->index[$i]['image'];
+            $allow_replies = $this->index[$i]['allow_replies'];
+            ?>
+            <div class="jumbotron">
+
+                <h1><?= $title ?></h1>
+                <h4 style="display: inline-block;">by:<?= $name ?> </h4>
+                <img src='<?= isset($image) ? $this->baseUrl() . "/uploads/user/" . $image : $this->baseUrl() . "/uploads/user/pic.png" ?>' class="img-responsive img-circle img-thumbnail" style="width: 7%;height: 7%;display: inline-block;"/>
+                <p style="text-align: justify;"><?= $content ?></p>
+            </div>
+            <div id="commentsDiv" style="background-color: rgba(197, 199, 255, 1);text-align: justify;padding-top: 1px; padding-bottom: 20px;">
+                <?php
+                if ($comment) {
+                    for ($i = 0; $i < count($this->index); $i++) {
+                        $comment = $this->index[$i]['comment'];
+                        $commenter = $this->index[$i]['c_name'];
+                        $commenter_img = $this->index[$i]['u_image'];
+                        $commenter_id = $this->index[$i]['c_user_id'];
+                        $comment_id = $this->index[$i]['c_id'];
+                        ?>
+                        <div class="commentItself" style="">
+                            <?php if ((!empty($this->auth_info) && $this->auth_info->id == $commenter_id) || $this->auth_info->type != "user") { ?>
+                                <span class="glyphicon glyphicon-remove btn btn-default deleteComment" id="<?= $comment_id ?>"
+                                      style="float: right;right: 5px;color: red;background-color: rgba(169, 171, 209, 1);font-size: medium"></span>
+
+                                <span class="glyphicon glyphicon-pencil btn btn-default editComment" id="<?= $comment_id ?>"
+                                      style="float: right;right: 5px;color: green;background-color: rgba(169, 171, 209, 1);font-size: medium"></span>
+                                  <?php } ?>
+                            <img src='<?= isset($commenter_img) ? $this->baseUrl() . "/uploads/user/" . $commenter_img : $this->baseUrl() . "/uploads/user/pic.png" ?>' class="img-responsive img-circle img-thumbnail" style="width: 7%;height: 7%;display: inline-block;"/>
+                            <span style=""><h3 style="display: inline;color:blue"><b><?= $commenter ?></b></h3></span>
+                            <div style="display: inline-block;word-wrap: break-word;margin-left: 2%;" class="comment_contentDiv">
+
+                                <h3 class="comment_content"><?= $comment ?> </h3>
+                            </div>
+                            <hr>
+                        </div>
+                        <?php
+                    }
+                }
+                if (!empty($this->auth_info) && $allow_replies == 1) {
+                    ?>
+                    <div id="addCommentDiv">
+                        <img src="<?= isset($this->auth_info->image) ? $this->baseUrl() . '/uploads/user/' . $this->auth_info->image : $this->baseUrl() . '/uploads/user/pic.png' ?>" class="img-responsive img-circle img-thumbnail" style="width: 7%;height: 7%;display: inline;float:left"/>
+                        <span style=""><h3 style="display: inline;color:blue;float:left"><b><?= $this->auth_info->name ?></b></h3></span>
+                        <textarea name="comment" id="comment_txt" style="resize: none;margin-left: 2%;margin-top: 2%;width: 70%;" rows="10"></textarea>
+                        <input style="float: right; margin-top: 3%;margin-right: 2%;" class="btn btn-primary" id="comment" type="button" value="comment"/>
+                        <br/><span class="errorMsg" id="commentError"></span>
+                    </div>
+                <?php } else if (empty($this->auth_info)) { ?>
+                    <a style="margin-left: 2%;margin-top: 2%;" class="btn btn-primary" href="<?= $this->baseUrl() ?>/login">Comment</a>
+                <?php } else { ?>
+                    <div>Adding Comments are disabled for this post .. try again later</div>
+                <?php } ?>
+            </div>
+            <?php
+        }
+    }
+    ?>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#comment").on("click", function () {
+            if ($("#comment_txt").val() != "") {
+                $(".errorMsg").html("");
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/comment/add",
+                    type: 'POST',
+                    data: {
+                        "comment": $("#comment_txt").val(),
+                        "post_id":<?= $this->post_id ?>
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.status == "success") {
+                            location.reload();
+                        } else if (data.status == "failed") {
+                            for (var key in data.errorMessages) {
+                                if (!data.errorMessages.hasOwnProperty(key))
+                                    continue;
+                                var errorMsg = data.errorMessages[key];
+                                $("#" + key + "Error").html(errorMsg);
+                            }
+                        } else if (data.status == "error") {
+                            alert("Error in  Add Post!! .. try again");
+                        } else if (data.status == "disallow") {
+                            alert("The Admin disallow the posts right now for this forum");
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "../../../login/logout"
+                        }
+                    },
+                    error: function (errorData) {
+                        console.log(errorData);
+                        alert("Error in F process");
+                    },
+                });
+                return false;
+            }
+        });
+        $(document).on("click", ".deleteComment", function () {
+            var commentDiv = $(this);
+            $.ajax({
+                url: "<?= $this->baseUrl() ?>/comment/delete",
+                method: "post",
+                dataType: "json",
+                data: {
+                    "comment_id": $(this).attr("id"),
+                    "post_id":<?= $this->post_id ?>
+                },
+                success: function (data) {
+                    if (data.status == "success") {
+                        $(commentDiv).parent().remove();
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "../../../login/logout"
+                    } else {
+                        alert("Error in delete process");
+                    }
+                },
+                error: function (errorData) {
+                    console.log(errorData);
+                    alert("Error in F process");
+                },
+            });
+        });
+        $(document).on("click", ".editComment", function () {
+            var div_itself = $(this).parent(".commentItself");
+            var comment_id = $(this).attr("id");
+            var comment = $(this).siblings(".comment_contentDiv").children(".comment_content").text();
+            $(this).parent(".commentItself").html('<textarea name="e_comment" class="e_comment_txt" style="resize: none;margin-left: 2%;margin-top: 2%;width: 85%;" rows="10"></textarea><input style="float: right; margin-top: 3%;margin-right: 2%;" class="btn btn-primary e_comment" id="' + comment_id + '" type="button" value="Edit"/><br/><span style="margin-left: 2%;" class="errorMsg" id="e_commentError"></span> <hr>');
+            $(div_itself).children("textarea.e_comment_txt").val(comment);
+        });
+        $(document).on("click", ".e_comment", function () {
+            var btn_var = $(this);
+            if ($(this).siblings(".e_comment_txt").val() != "") {
+                $(this).siblings(".errorMsg").html("");
+                $.ajax({
+                    url: "<?= $this->baseUrl() ?>/comment/edit",
+                    type: 'POST',
+                    data: {
+                        "comment": $(this).siblings(".e_comment_txt").val(),
+                        "id": $(this).attr("id"),
+                        "post_id":<?= $this->post_id ?>
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.status == "success") {
+                            location.reload();
+                        } else if (data.status == "failed") {
+                            for (var key in data.errorMessages) {
+                                if (!data.errorMessages.hasOwnProperty(key))
+                                    continue;
+                                var errorMsg = data.errorMessages[key];
+//                                console.log($(btn_var).siblings("#" + key + "Error"));
+                                $(btn_var).siblings(".errorMsg").html(errorMsg);
+                            }
+                        } else if (data.status == "error") {
+                            alert("Error in  Edit Comment!! .. try again");
+                        } else if (data.status == "disallow") {
+                            alert("The Admin disallow the posts right now for this forum");
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "../../../login/logout"
+                        }
+                    },
+                    error: function (errorData) {
+                        console.log(errorData);
+                        alert("Error in F process");
+                    },
+                });
+                return false;
+            }
+        });
+    });
+</script>

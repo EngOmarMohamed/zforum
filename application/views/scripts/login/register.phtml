@@ -133,6 +133,7 @@
                     contentType: false,
                     success: function (data) {
                         if (data.status == "success") {
+                            alert("your registeration info has been sent to your email");
                             window.location.href = "index"
                         } else if (data.status == "failed") {
                             for (var key in data.errorMessages) {
@@ -145,7 +146,11 @@
                         } else if (data.status == "error") {
                             alert("Error in  Add User!! .. try again");
                         } else if (data.status == "errorRedirect") {
-                            alert("can't redirect to home");
+                            alert("you can login now ... the system failed to send email and redirect to home");
+                            window.location.href = "../login/"
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
                         }
                     },
                     error: function (errorData) {
@@ -170,5 +175,6 @@
 
     function imageIsLoaded(e) {
         $('#myImg').attr('src', e.target.result);
-    };
+    }
+    ;
 </script>

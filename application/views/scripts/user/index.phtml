@@ -226,6 +226,9 @@
                             } else {
                                 $(btn).html("<span class='glyphicon glyphicon-thumbs-up'>Make Admin</span>");
                             }
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
                         } else {
                             alert("Error in Change Supervision");
                         }
@@ -267,6 +270,9 @@
                                 $(btn).addClass("btn-warning");
                                 $(btn).html("<span class='glyphicon glyphicon-ban-circle'>Ban</span>");
                             }
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
                         } else {
                             alert("Error in Change Blocking");
                         }
@@ -302,6 +308,9 @@
                     console.log(data);
                     if (data.status == "success") {
                         $(userRow).parent().parent().remove();
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     } else {
                         alert("Error in delete process");
                     }
@@ -314,7 +323,7 @@
         });
 
         $(document).on("click", ".fillEditUser", function () {
-        $(".errorMsg").html("");
+            $(".errorMsg").html("");
             $.ajax({
                 url: "<?= $this->baseUrl() ?>/user/edit",
                 method: "get",
@@ -329,6 +338,9 @@
                         $('#editUserModal #e_signature').val(data.editRow.signature);
                         $('#editUserModal #e_email').val(data.editRow.email);
                         $('#editUserModal #editID').val(data.editRow.id);
+                    } else if (data.status == "system") {
+                        alert("you are redirected to logout .. try again");
+                        window.location.href = "login/logout"
                     } else {
                         alert("Error in Edit process");
                     }
@@ -366,6 +378,9 @@
                             }
                         } else if (data.status == "error") {
                             alert("Error in  Add User!! .. try again");
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
                         }
                     },
                     error: function (errorData) {
@@ -403,6 +418,9 @@
                             }
                         } else if (data.status == "error") {
                             alert("Error in  Add User!! .. try again");
+                        } else if (data.status == "system") {
+                            alert("you are redirected to logout .. try again");
+                            window.location.href = "login/logout"
                         }
                     },
                     error: function (errorData) {

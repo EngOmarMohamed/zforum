@@ -123,6 +123,23 @@ class Application_Model_DbTable_User extends Zend_Db_Table_Abstract {
             return false;
         }
     }
+    public function checkBlockingById($id) {
+        try {
+            $userRow = $this->fetchRow("id = '" . $id . "'");
+            if (!empty($userRow)) {
+                $userRow = $userRow->toArray();
+            } else {
+                return true;
+            }
+
+            if ($userRow["ban_flag"] == 1) {
+                return true;
+            }
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 
     public function checkIfAdmin($uname) {
         try {
