@@ -173,7 +173,7 @@
             <div class='panel-group' id="<?= $cat_id ?>">
                 <div class='panel panel-default panel-info'>
                     <div class='panel-heading'>
-                        <a style='float: left;' data-toggle='collapse'    class='btn  btn-type btn-sm btn-default collapsed' href='#collapse<?= $i ?>'></a>
+                        <a style='float: left;' data-toggle='collapse'    class='btn  btn-type btn-sm btn-default' href='#collapse<?= $i ?>'></a>
                         <?php if (isset($this->auth_info) && $this->auth_info->type != "user") { ?>
                             <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-success addForumBtn' data-toggle='modal' data-target='#addForumModal'><span class="glyphicon glyphicon-plus"></span> Add Forum</button>
                             <button style="float: right;height: 30px;line-height: 40px;border-radius: 18px;padding: 0 13px 1px 7px;" class='btn btn-danger deleteCat'><span class="glyphicon glyphicon-remove-circle"></span>Delete</button>
@@ -185,7 +185,7 @@
 
                         </div>
                     </div>
-                    <div  id='collapse<?= $i ?>' class='panel-collapse collapse'>
+                    <div  id='collapse<?= $i ?>' class='panel-collapse collapse in'>
                         <table>
                             <thead>
                                 <tr>
