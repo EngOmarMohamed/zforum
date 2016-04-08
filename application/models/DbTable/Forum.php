@@ -76,7 +76,8 @@ class Application_Model_DbTable_Forum extends Zend_Db_Table_Abstract {
                     ->from(array('p' => 'post'), array('id', 'title', 'forum_id', 'allow_replies'))
                     ->join(array('u' => 'users'), 'p.user_id = u.id', array('user_id' => 'id', 'username'))
                     ->join(array('f' => 'forum'), 'f.id = p.forum_id', array('forum_name' => 'name', "allow_post"))
-                    ->where("f.id = $id");
+                    ->where("f.id = $id")
+		    ->order(array('sticky DESC'));
 
             $resultSet = $this->fetchAll($sql);
             return $resultSet->toArray();

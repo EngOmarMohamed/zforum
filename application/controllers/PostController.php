@@ -164,4 +164,22 @@ class PostController extends Zend_Controller_Action {
         }
     }
 
+	    public function changeStickyAction() {
+        if (strtolower(filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest') {
+            if ($this->getRequest()->isPost()) {
+                $post_id = $this->_request->getParam("post_id");
+                
+                $sticky = PostController::$postModel->changeSticky($post_id);
+                if (isset($sticky)) {
+                    echo json_encode(array("status" => "success", "sticky" => $sticky));
+                    exit;
+                }
+                echo json_encode(array("status" => "failed"));
+                exit;
+            }
+        } else {
+            $this->redirect("error/error");
+        }
+    }
+
 }

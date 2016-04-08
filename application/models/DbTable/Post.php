@@ -97,6 +97,24 @@ class Application_Model_DbTable_Post extends Zend_Db_Table_Abstract {
             return false;
         }
     }
+	public function changeSticky($id) {
+        try {
+            $row = $this->fetchRow("id=" . $id)->toArray()['sticky'];
+            $editRow = $this->fetchRow("id=" . $id);
+            if (empty($editRow)) {
+                return false;
+            }
+            if ($row) {
+                $editRow->sticky = 0;
+            } else {
+                $editRow->sticky = 1;
+            }
+            $editRow->save();
+            return !$row;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
 
     public function addPost($data) {
         try {

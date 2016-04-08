@@ -29,18 +29,18 @@
                         $comment_id = $this->index[$i]['c_id'];
                         ?>
                         <div class="commentItself" style="">
-                            <?php if ((!empty($this->auth_info) && $this->auth_info->id == $commenter_id) || $this->auth_info->type != "user") { ?>
+                            <?php if ((!empty($this->auth_info) && $this->auth_info->id == $commenter_id) || (!empty($this->auth_info) && $this->auth_info->type != "user")) { ?>
                                 <span class="glyphicon glyphicon-remove btn btn-default deleteComment" id="<?= $comment_id ?>"
                                       style="float: right;right: 5px;color: red;background-color: rgba(169, 171, 209, 1);font-size: medium"></span>
 
                                 <span class="glyphicon glyphicon-pencil btn btn-default editComment" id="<?= $comment_id ?>"
                                       style="float: right;right: 5px;color: green;background-color: rgba(169, 171, 209, 1);font-size: medium"></span>
                                   <?php } ?>
-                            <img src='<?= isset($commenter_img) ? $this->baseUrl() . "/uploads/user/" . $commenter_img : $this->baseUrl() . "/uploads/user/pic.png" ?>' class="img-responsive img-circle img-thumbnail" style="width: 7%;height: 7%;display: inline-block;"/>
-                            <span style=""><h3 style="display: inline;color:blue"><b><?= $commenter ?></b></h3></span>
+                            <img src='<?= isset($commenter_img) ? $this->baseUrl() . "/uploads/user/" . $commenter_img : $this->baseUrl() . "/uploads/user/pic.png" ?>' class="img-responsive img-circle img-thumbnail" style="width: 5%;height: 5%;display: inline-block;"/>
+                            <span style=""><h4 style="display: inline;color:blue"><b><?= $commenter ?></b></h4></span>
                             <div style="display: inline-block;word-wrap: break-word;margin-left: 2%;" class="comment_contentDiv">
 
-                                <h3 class="comment_content"><?= $comment ?> </h3>
+                                <h4 class="comment_content"><?= $comment ?> </h4>
                             </div>
                             <hr>
                         </div>
@@ -50,7 +50,7 @@
                 if (!empty($this->auth_info) && $allow_replies == 1) {
                     ?>
                     <div id="addCommentDiv">
-                        <img src="<?= isset($this->auth_info->image) ? $this->baseUrl() . '/uploads/user/' . $this->auth_info->image : $this->baseUrl() . '/uploads/user/pic.png' ?>" class="img-responsive img-circle img-thumbnail" style="width: 7%;height: 7%;display: inline;float:left"/>
+                        <img src="<?= isset($this->auth_info->image) ? $this->baseUrl() . '/uploads/user/' . $this->auth_info->image : $this->baseUrl() . '/uploads/user/pic.png' ?>" class="img-responsive img-circle img-thumbnail" style="width: 5%;height: 5%;display: inline;float:left"/>
                         <span style=""><h3 style="display: inline;color:blue;float:left"><b><?= $this->auth_info->name ?></b></h3></span>
                         <textarea name="comment" id="comment_txt" style="resize: none;margin-left: 2%;margin-top: 2%;width: 70%;" rows="10"></textarea>
                         <input style="float: right; margin-top: 3%;margin-right: 2%;" class="btn btn-primary" id="comment" type="button" value="comment"/>
