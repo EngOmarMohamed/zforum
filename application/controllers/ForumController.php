@@ -131,4 +131,21 @@ class ForumController extends Zend_Controller_Action {
         }
     }
 
+public function deleteAction() {
+        if (strtolower(filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH')) === 'xmlhttprequest') {
+            if ($this->getRequest()->isPost()) {
+                $forum_id = $this->_request->getParam("forum_id");
+                $delete = ForumController::$forumModel->deleteForum($forum_id);
+                if ($delete) {
+                    echo json_encode(array("status" => "success"));
+                    exit;
+                }
+                echo json_encode(array("status" => "failed"));
+                exit;
+            }
+        } else {
+            $this->redirect("error/error");
+        }
+    }
+
 }
